@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import "@/styles/globals.css";
 
+import { AppWrapperProvider } from "@/components/providers/app-wrapper";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { APP_NAME } from "@/constants";
 import { geistMono, geistSans } from "@/lib/fonts";
@@ -49,7 +50,7 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					{children}
+					<AppWrapperProvider>{children}</AppWrapperProvider>
 				</ThemeProvider>
 			</body>
 		</html>
