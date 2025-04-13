@@ -277,11 +277,12 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
         "fromEnvVar": "DATABASE_URL",
-        "value": "postgresql://writtak_owner:npg_LpTxrfMdZ02z@ep-restless-smoke-a17vwrz5-pooler.ap-southeast-1.aws.neon.tech/writtak?sslmode=require"
+        "value": null
       }
     }
   },

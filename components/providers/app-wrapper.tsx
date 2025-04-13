@@ -1,4 +1,5 @@
 import { SiteHeader } from "@/components/global/header";
+import { QueryAppProvider } from "@/components/providers/query-app-provider";
 
 export const AppWrapperProvider = ({
 	children,
@@ -8,7 +9,9 @@ export const AppWrapperProvider = ({
 	return (
 		<div className="flex min-h-screen flex-col">
 			<SiteHeader />
-			<main className="container grow p-4">{children}</main>
+			<main className="container grow p-4">
+				<QueryAppProvider>{children}</QueryAppProvider>
+			</main>
 		</div>
 	);
 };
