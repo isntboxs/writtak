@@ -117,13 +117,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.PostScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  content: 'content',
-  published: 'published'
-};
-
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -206,6 +199,43 @@ exports.Prisma.InvitationScalarFieldEnum = {
   inviterId: 'inviterId'
 };
 
+exports.Prisma.PostScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  url: 'url',
+  content: 'content',
+  points: 'points',
+  commentCount: 'commentCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.CommentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  postId: 'postId',
+  parentCommentId: 'parentCommentId',
+  content: 'content',
+  points: 'points',
+  commentCount: 'commentCount',
+  depth: 'depth',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PostUpvoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  postId: 'postId'
+};
+
+exports.Prisma.CommentUpvoteScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  commentId: 'commentId'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -223,14 +253,17 @@ exports.Prisma.NullsOrder = {
 
 
 exports.Prisma.ModelName = {
-  Post: 'Post',
   User: 'User',
   Session: 'Session',
   Account: 'Account',
   Verification: 'Verification',
   Organization: 'Organization',
   Member: 'Member',
-  Invitation: 'Invitation'
+  Invitation: 'Invitation',
+  Post: 'Post',
+  Comment: 'Comment',
+  PostUpvote: 'PostUpvote',
+  CommentUpvote: 'CommentUpvote'
 };
 
 /**

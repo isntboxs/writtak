@@ -14,13 +14,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String
-  published Boolean @default(false)
-}
-
 model User {
   id              String       @id
   name            String
@@ -40,6 +33,11 @@ model User {
   accounts        Account[]
   members         Member[]
   invitations     Invitation[]
+
+  posts          Post[]          @relation(name: "PostAuthor")
+  comments       Comment[]       @relation(name: "CommentAuthor")
+  postUpvotes    PostUpvote[]    @relation(name: "PostUpvoteUser")
+  commentUpvotes CommentUpvote[] @relation(name: "CommentUpvoteUser")
 
   @@unique([email])
   @@unique([username])
@@ -131,4 +129,69 @@ model Invitation {
   user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
 
   @@map("invitation")
+}
+
+model Post {
+  id           Int     @id @default(autoincrement())
+  userId       String
+  title        String
+  url          String?
+  content      String?
+  points       Int     @default(0)
+  commentCount Int     @default(0)
+
+  author      User         @relation(name: "PostAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  comments    Comment[]    @relation(name: "CommentPost")
+  postUpvotes PostUpvote[] @relation(name: "PostUpvotePost")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("post")
+}
+
+model Comment {
+  id              Int    @id @default(autoincrement())
+  userId          String
+  postId          Int
+  parentCommentId Int?
+  content         String
+  points          Int    @default(0)
+  commentCount    Int    @default(0)
+  depth           Int    @default(0)
+
+  author         User            @relation(name: "CommentAuthor", fields: [userId], references: [id], onDelete: Cascade)
+  post           Post            @relation(name: "CommentPost", fields: [postId], references: [id], onDelete: Cascade)
+  parentComment  Comment?        @relation(name: "CommentParent", fields: [parentCommentId], references: [id], onDelete: SetNull)
+  childComments  Comment[]       @relation(name: "CommentParent")
+  commentUpvotes CommentUpvote[] @relation(name: "CommentUpvoteComment")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("comment")
+}
+
+model PostUpvote {
+  id     Int    @id @default(autoincrement())
+  userId String
+  postId Int
+
+  user User @relation(name: "PostUpvoteUser", fields: [userId], references: [id], onDelete: Cascade)
+  post Post @relation(name: "PostUpvotePost", fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@map("post_upvote")
+}
+
+model CommentUpvote {
+  id        Int    @id @default(autoincrement())
+  userId    String
+  commentId Int
+
+  user    User    @relation(name: "CommentUpvoteUser", fields: [userId], references: [id], onDelete: Cascade)
+  comment Comment @relation(name: "CommentUpvoteComment", fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@map("comment_upvote")
 }
