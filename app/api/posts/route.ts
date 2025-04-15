@@ -1,8 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { z } from "zod";
+
 import { getSessionAction } from "@/actions/get-session-action";
 import { db } from "@/db";
 import { Post } from "@/types/post-type";
+
+const sortBySchema = z.enum(["points", "recent"]);
+const sortOrderSchema = z.enum(["asc", "desc"]);
+
+const paginationSchema = z.object({
+	limit: z.number({ coerce: true }).optional().default(10),
+	page: z.number({ coerce: true }).optional().default(1),
+	sortBy: sortBySchema.optional().default("points"),
+	sortOrder: sortOrderSchema.optional().default("desc"),
+	author: z.string().optional(),
+	site: z.string().optional(),
+});
 
 export const GET = async (req: NextRequest) => {
 	try {
@@ -13,19 +27,27 @@ export const GET = async (req: NextRequest) => {
 		}
 
 		const { searchParams } = req.nextUrl;
+		const validatedQuery = paginationSchema.safeParse(
+			Object.fromEntries(searchParams)
+		);
 
-		const limit = searchParams.get("limit") || 10;
-		const page = searchParams.get("page") || 1;
-		const sortBy = searchParams.get("sortBy") || "points";
-		const sortOrder = searchParams.get("sortOrder") || "desc";
-		const authorId = searchParams.get("authorId") || undefined;
-		const site = searchParams.get("site") || undefined;
+		if (!validatedQuery.success) {
+			return NextResponse.json(
+				{ message: "Invalid query parameters", errors: validatedQuery.error },
+				{ status: 400 }
+			);
+		}
 
-		const offset = (Number(page) - 1) * Number(limit);
+		const { limit, page, sortBy, sortOrder, author, site } =
+			validatedQuery.data;
+
+		const offset = (page - 1) * limit;
+		const sortByColumn = sortBy === "points" ? "points" : "createdAt";
+		const sortOrderValue = sortOrder === "desc" ? "desc" : "asc";
 
 		const whereClause = {
-			userId: authorId,
-			url: site,
+			userId: author ? author : undefined,
+			url: site ? site : undefined,
 		};
 
 		const count = await db.post.count({
@@ -35,10 +57,10 @@ export const GET = async (req: NextRequest) => {
 		const posts = await db.post.findMany({
 			where: whereClause,
 			orderBy: {
-				[sortBy]: sortOrder,
+				[sortByColumn]: sortOrderValue,
 			},
 			skip: offset,
-			take: Number(limit),
+			take: limit,
 			select: {
 				id: true,
 				title: true,
