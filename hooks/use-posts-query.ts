@@ -1,5 +1,6 @@
 import { infiniteQueryOptions, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
+import { useQueryState } from "nuqs";
 
 import { Post } from "@/types/post-type";
 
@@ -79,7 +80,45 @@ const postsInfiniteQueryOptions = ({
 	});
 
 export const usePostsQuery = () => {
-	const { data } = useInfiniteQuery(postsInfiniteQueryOptions({}));
+	const [sortBy, setSortBy] = useQueryState("sortBy", {
+		defaultValue: "recent",
+	});
+	const [sortOrder, setSortOrder] = useQueryState("sortOrder", {
+		defaultValue: "desc",
+	});
+	const [author, setAuthor] = useQueryState("author", { defaultValue: "" });
+	const [site, setSite] = useQueryState("site", { defaultValue: "" });
 
-	return { data };
+	const {
+		data,
+		isFetchingNextPage,
+		fetchNextPage,
+		hasNextPage,
+		isPending,
+		isLoading,
+	} = useInfiniteQuery(
+		postsInfiniteQueryOptions({
+			sortBy,
+			sortOrder,
+			author,
+			site,
+		})
+	);
+
+	return {
+		data,
+		isFetchingNextPage,
+		fetchNextPage,
+		hasNextPage,
+		isPending,
+		isLoading,
+		sortBy,
+		setSortBy,
+		sortOrder,
+		setSortOrder,
+		author,
+		setAuthor,
+		site,
+		setSite,
+	};
 };
