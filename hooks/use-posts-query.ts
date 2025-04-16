@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { infiniteQueryOptions, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 import { Post } from "@/types/post-type";
@@ -11,65 +11,65 @@ type PostsResponse = {
 	};
 };
 
-type PostsQueryParams = {
-	limit?: number;
-	page?: number;
+type Pagination = {
 	sortBy?: string;
-	sortOrder?: "asc" | "desc";
+	sortOrder?: string;
 	author?: string;
 	site?: string;
 };
 
-export const usePostsQuery = (params: PostsQueryParams = {}) => {
-	const {
-		limit = 10,
-		sortBy = "points",
-		sortOrder = "desc",
-		author,
-		site,
-	} = params;
+const getPostsAxios = async ({
+	pageParam = 1,
+	pagination,
+}: {
+	pageParam: number;
+	pagination: Pagination;
+}) => {
+	try {
+		const response = await axios.get<PostsResponse>(`/api/posts`, {
+			params: {
+				page: pageParam,
+				sortBy: pagination.sortBy,
+				sortOrder: pagination.sortOrder,
+				author: pagination.author,
+				site: pagination.site,
+			},
+		});
 
-	const { data } = useInfiniteQuery({
-		queryKey: ["posts", { limit, sortBy, sortOrder, author, site }],
-		queryFn: async ({ pageParam = 1 }) => {
-			const searchParams = new URLSearchParams();
-			searchParams.set("page", String(pageParam));
-			searchParams.set("limit", String(limit));
-			searchParams.set("sortBy", sortBy);
-			searchParams.set("sortOrder", sortOrder);
+		return response.data;
+	} catch (error) {
+		if (axios.isAxiosError(error) && error.response) {
+			throw new Error(error.response.data.error || "Failed to fetch posts");
+		}
+		throw new Error("Failed to fetch posts");
+	}
+};
 
-			if (author) searchParams.set("author", author);
-			if (site) searchParams.set("site", site);
-
-			try {
-				console.log(`Making request to: /api/posts?${searchParams.toString()}`);
-				const response = await axios.get<PostsResponse>(
-					`/api/posts?${searchParams.toString()}`,
-					{
-						withCredentials: true, // Add this to ensure cookies are sent
-					}
-				);
-				return response.data;
-			} catch (error) {
-				if (axios.isAxiosError(error)) {
-					console.error("API Error:", error.message);
-					if (error.response) {
-						console.error("Response data:", error.response.data);
-						console.error("Response status:", error.response.status);
-						throw new Error(
-							error.response.data.error ||
-								`Server error: ${error.response.status}`
-						);
-					} else if (error.request) {
-						console.error("No response received:", error.request);
-						throw new Error("No response received from server");
-					}
-				}
-				console.error("Unexpected error:", error);
-				throw new Error("Failed to fetch posts", { cause: error });
-			}
-		},
+const postsInfiniteQueryOptions = ({
+	sortBy = "points",
+	sortOrder = "desc",
+	author = "",
+	site = "",
+}: {
+	sortBy?: string;
+	sortOrder?: string;
+	author?: string;
+	site?: string;
+}) =>
+	infiniteQueryOptions({
+		queryKey: ["posts", sortBy, sortOrder, author, site],
+		queryFn: ({ pageParam }) =>
+			getPostsAxios({
+				pageParam,
+				pagination: {
+					sortBy,
+					sortOrder,
+					author,
+					site,
+				},
+			}),
 		initialPageParam: 1,
+		staleTime: Infinity,
 		getNextPageParam: (lastPage, allPages, lastPageParam) => {
 			if (lastPage.pagination.totalPages <= lastPageParam) {
 				return undefined;
@@ -78,7 +78,8 @@ export const usePostsQuery = (params: PostsQueryParams = {}) => {
 		},
 	});
 
-	return {
-		data,
-	};
+export const usePostsQuery = () => {
+	const { data } = useInfiniteQuery(postsInfiniteQueryOptions({}));
+
+	return { data };
 };
