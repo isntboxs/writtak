@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 
 import "@/styles/globals.css";
 
+import { Toaster } from "sonner";
+
 import { AppWrapperProvider } from "@/components/providers/app-wrapper";
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { APP_NAME } from "@/constants";
@@ -50,7 +52,10 @@ export default function RootLayout({
 					enableSystem
 					disableTransitionOnChange
 				>
-					<AppWrapperProvider>{children}</AppWrapperProvider>
+					<AppWrapperProvider>
+						{children}
+						<Toaster position="top-center" richColors />
+					</AppWrapperProvider>
 				</ThemeProvider>
 			</body>
 		</html>

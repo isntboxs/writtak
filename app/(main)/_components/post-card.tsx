@@ -27,12 +27,14 @@ export const PostCard = ({
 	setSite,
 	author,
 	setAuthor,
+	onUpvote,
 }: {
 	post: Post;
 	site: string;
 	setSite: (site: string) => void;
 	author: string;
 	setAuthor: (author: string) => void;
+	onUpvote?: (id: number) => void;
 }) => {
 	return (
 		<Card className="overflow-hidden py-0">
@@ -48,10 +50,11 @@ export const PostCard = ({
 						<Tooltip>
 							<TooltipTrigger asChild>
 								<Button
+									onClick={() => onUpvote?.(post.id)}
 									variant={post.isUpvoted ? "default" : "outline"}
 									size="icon"
 									className={cn(
-										"size-8 rounded-full transition-all duration-500"
+										"size-8 cursor-pointer rounded-full transition-all duration-500"
 									)}
 									aria-label="upvote"
 								>

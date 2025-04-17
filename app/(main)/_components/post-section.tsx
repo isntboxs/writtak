@@ -6,6 +6,7 @@ import { PostCard } from "@/app/(main)/_components/post-card";
 import { SortBarPosts } from "@/app/(main)/_components/sort-bar-posts";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useUpvotePost } from "@/hooks/posts-hooks";
 import { usePostsQuery } from "@/hooks/use-posts-query";
 
 export const PostSection = () => {
@@ -25,6 +26,8 @@ export const PostSection = () => {
 		author,
 		setAuthor,
 	} = usePostsQuery();
+
+	const upVoteMutation = useUpvotePost();
 
 	return (
 		<>
@@ -48,6 +51,7 @@ export const PostSection = () => {
 								site={site}
 								author={author}
 								setAuthor={setAuthor}
+								onUpvote={() => upVoteMutation.mutate(post.id.toString())}
 							/>
 						))
 					)}
