@@ -62,17 +62,17 @@ export const MobileNavHeader = () => {
 					<div className="grid gap-4 px-4">
 						<SheetClose asChild>
 							<Button variant="outline" className="cursor-pointer" asChild>
-								<Link href="#">new</Link>
+								<Link href="/">new</Link>
 							</Button>
 						</SheetClose>
 						<SheetClose asChild>
 							<Button variant="outline" className="cursor-pointer" asChild>
-								<Link href="#">top</Link>
+								<Link href="/">top</Link>
 							</Button>
 						</SheetClose>
 						<SheetClose asChild>
 							<Button variant="outline" className="cursor-pointer" asChild>
-								<Link href="#">submit</Link>
+								<Link href="/submit">submit</Link>
 							</Button>
 						</SheetClose>
 					</div>

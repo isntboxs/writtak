@@ -37,7 +37,7 @@ export const DesktopNavHeader = () => {
 					<Link href="#">top</Link>
 				</Button>
 				<Button variant="ghost" size="sm" className="cursor-pointer" asChild>
-					<Link href="#">submit</Link>
+					<Link href="/submit">submit</Link>
 				</Button>
 			</nav>
 

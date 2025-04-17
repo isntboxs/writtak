@@ -24,6 +24,12 @@ type PostsResponse = {
 	};
 };
 
+type PostSubmitResponse = {
+	data: {
+		postId: number;
+	};
+};
+
 const updatePostUpvote = (draf: Post) => {
 	draf.points += draf.isUpvoted ? -1 : +1;
 	draf.isUpvoted = !draf.isUpvoted;
@@ -34,6 +40,28 @@ const postUpvoteAxios = async (postId: string) => {
 		`/api/posts/${postId}/upvote`
 	);
 	return data;
+};
+
+export const postSubmitAxios = async (
+	title: string,
+	url?: string,
+	content?: string
+) => {
+	try {
+		const res = await axios.post<PostSubmitResponse>(`/api/posts`, {
+			title,
+			url,
+			content,
+		});
+
+		return res;
+	} catch (error) {
+		console.error(error);
+		if (axios.isAxiosError(error) && error.response) {
+			throw new Error(error.response.data.error || "Failed to fetch posts");
+		}
+		throw new Error("Failed to fetch posts");
+	}
 };
 
 export const useUpvotePost = () => {

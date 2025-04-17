@@ -74,6 +74,9 @@ export const GET = async (req: NextRequest) => {
 					select: {
 						id: true,
 						username: true,
+						name: true,
+						displayUsername: true,
+						image: true,
 					},
 				},
 				// Only include postUpvotes when user is authenticated
@@ -131,7 +134,7 @@ export const POST = async (req: NextRequest) => {
 			},
 		});
 
-		return NextResponse.json({ postId: newPost.id });
+		return NextResponse.json({ data: { postId: newPost.id } });
 	} catch (error) {
 		console.log(error);
 		if (error instanceof Error) {

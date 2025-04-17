@@ -18,6 +18,8 @@ export const createPostSchema = z
 		path: ["content", "url"],
 	});
 
+export type CreatePostType = z.infer<typeof createPostSchema>;
+
 export type Post = {
 	id: number;
 	title: string;
@@ -29,6 +31,9 @@ export type Post = {
 	author: {
 		id: string;
 		username: string;
+		name: string;
+		image: string | null;
+		displayUsername: string | null;
 	};
 	isUpvoted: boolean;
 };

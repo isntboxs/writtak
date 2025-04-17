@@ -3,7 +3,7 @@ import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { ChevronUpIcon, ExternalLink, MessageSquare } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge, badgeVariants } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -112,21 +112,25 @@ export const PostCard = ({
 					<CardFooter className="text-muted-foreground flex flex-wrap items-center gap-y-1 p-3 pt-0 text-xs sm:p-4">
 						<div className="flex items-center">
 							<Avatar className="mr-1.5 h-5 w-5">
-								{/* {post.author.avatar && (
+								{post.author.image && (
 									<AvatarImage
-										src={post.author.avatar || "/placeholder.svg"}
-										alt={post.author.username}
+										src={post.author.image || "/placeholder.svg"}
+										alt={post.author.username ?? post.author.name}
 									/>
-								)} */}
+								)}
 								<AvatarFallback className="text-[10px] uppercase">
-									{post.author.username.slice(0, 2)}
+									{post.author.username
+										? post.author.username.slice(0, 2)
+										: post.author.name.slice(0, 2)}
 								</AvatarFallback>
 							</Avatar>
 							<span
 								className="hover:text-primary cursor-pointer transition-all duration-500"
 								onClick={() => setAuthor(post.author.id ?? author)}
 							>
-								{post.author.username}
+								{post.author.username
+									? post.author.username
+									: post.author.name.padEnd(1, " ")}
 							</span>
 						</div>
 
