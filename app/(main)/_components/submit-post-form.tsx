@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
 import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -26,11 +25,10 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { postSubmitAxios } from "@/hooks/posts-hooks";
+import { useSubmitPost } from "@/hooks/posts-hooks";
 import { createPostSchema, CreatePostType } from "@/types/post-type";
 
 export const SubmitPostForm = () => {
-	const queryClient = useQueryClient();
 	const router = useRouter();
 
 	const form = useForm<CreatePostType>({
@@ -44,15 +42,24 @@ export const SubmitPostForm = () => {
 		reValidateMode: "onChange",
 	});
 
+	const submitMutation = useSubmitPost();
+
 	const onSubmit = async (data: CreatePostType) => {
-		const res = await postSubmitAxios(data.title, data.url, data.content);
-		if (res.status === 200 || res.status === 201) {
-			await queryClient.invalidateQueries({ queryKey: ["posts"] });
-			router.push(`/post/${res.data.data.postId}`);
-		} else {
-			console.log(res);
-			toast.error("Failed to submit post", { description: res.statusText });
-		}
+		submitMutation.mutate(
+			{ title: data.title, url: data.url, content: data.content },
+			{
+				onSuccess: (data) => {
+					router.push(`/post/${data.postId}`);
+				},
+				onError: (error) => {
+					console.log(error);
+					toast.error("Failed to submit post", {
+						description:
+							error instanceof Error ? error.message : "Unknown error",
+					});
+				},
+			}
+		);
 	};
 	return (
 		<Card className="mx-auto mt-12 max-w-md">

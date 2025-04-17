@@ -64,6 +64,34 @@ export const postSubmitAxios = async (
 	}
 };
 
+type SubmitPostParams = {
+	title: string;
+	url?: string;
+	content?: string;
+};
+
+export const useSubmitPost = () => {
+	const queryClient = useQueryClient();
+
+	return useMutation({
+		mutationFn: async (params: SubmitPostParams) => {
+			const res = await postSubmitAxios(
+				params.title,
+				params.url,
+				params.content
+			);
+			return res.data.data;
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["posts"] });
+		},
+		onError: (error) => {
+			console.error(error);
+			toast.error("Failed to submit post");
+		},
+	});
+};
+
 export const useUpvotePost = () => {
 	const queryClient = useQueryClient();
 
