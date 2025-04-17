@@ -4,6 +4,7 @@ import { z } from "zod";
 
 import { getSessionAction } from "@/actions/get-session-action";
 import { db } from "@/db";
+import { CHANNELS, EVENTS, pusherServer } from "@/lib/pusher";
 import { Post } from "@/types/post-type";
 
 const sortBySchema = z.enum(["points", "recent"]);
@@ -131,7 +132,34 @@ export const POST = async (req: NextRequest) => {
 			},
 			select: {
 				id: true,
+				title: true,
+				url: true,
+				content: true,
+				points: true,
+				commentCount: true,
+				createdAt: true,
+				updatedAt: true,
+				author: {
+					select: {
+						id: true,
+						username: true,
+						name: true,
+						displayUsername: true,
+						image: true,
+					},
+				},
 			},
+		});
+
+		// Import pusherServer at the top of the file
+		// const { pusherServer, CHANNELS, EVENTS } = await import("@/lib/pusher");
+
+		// Trigger a Pusher event for the new post
+		await pusherServer.trigger(CHANNELS.POSTS, EVENTS.NEW_POST, {
+			...newPost,
+			isUpvoted: false,
+			createdAt: newPost.createdAt.toISOString(),
+			updatedAt: newPost.updatedAt.toISOString(),
 		});
 
 		return NextResponse.json({ data: { postId: newPost.id } });

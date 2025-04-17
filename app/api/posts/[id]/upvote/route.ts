@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getSessionAction } from "@/actions/get-session-action";
 import { db } from "@/db";
+import { CHANNELS, EVENTS, pusherServer } from "@/lib/pusher";
 
 export interface Context {
 	params: Promise<{ id: string }>;
@@ -58,6 +59,16 @@ export const POST = async (req: NextRequest, ctx: Context) => {
 			}
 
 			return updatePost.points;
+		});
+
+		// Import pusherServer at the top of the file
+		// const { pusherServer, CHANNELS, EVENTS } = await import("@/lib/pusher");
+
+		// Trigger a Pusher event for the upvote
+		await pusherServer.trigger(CHANNELS.POSTS, EVENTS.UPVOTE, {
+			postId,
+			points,
+			isUpvoted: pointsChange > 0,
 		});
 
 		return NextResponse.json({

@@ -1,6 +1,7 @@
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 import { SiteHeader } from "@/components/global/header";
+import { PusherProvider } from "@/components/providers/pusher-provider";
 import { QueryAppProvider } from "@/components/providers/query-app-provider";
 
 export const AppWrapperProvider = ({
@@ -13,7 +14,9 @@ export const AppWrapperProvider = ({
 			<SiteHeader />
 			<main className="container grow p-4">
 				<NuqsAdapter>
-					<QueryAppProvider>{children}</QueryAppProvider>
+					<QueryAppProvider>
+						<PusherProvider>{children}</PusherProvider>
+					</QueryAppProvider>
 				</NuqsAdapter>
 			</main>
 		</div>

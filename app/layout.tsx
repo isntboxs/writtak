@@ -54,7 +54,7 @@ export default function RootLayout({
 				>
 					<AppWrapperProvider>
 						{children}
-						<Toaster position="top-center" richColors />
+						<Toaster position="top-center" richColors closeButton expand />
 					</AppWrapperProvider>
 				</ThemeProvider>
 			</body>
