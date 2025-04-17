@@ -1,7 +1,10 @@
 "use client";
 
+import { ArrowRight, Loader2 } from "lucide-react";
+
 import { PostCard } from "@/app/(main)/_components/post-card";
 import { SortBarPosts } from "@/app/(main)/_components/sort-bar-posts";
+import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePostsQuery } from "@/hooks/use-posts-query";
 
@@ -10,6 +13,9 @@ export const PostSection = () => {
 		data,
 		isLoading,
 		isPending,
+		isFetchingNextPage,
+		fetchNextPage,
+		hasNextPage,
 		sortBy,
 		setSortBy,
 		sortOrder,
@@ -29,7 +35,7 @@ export const PostSection = () => {
 				setOrderBy={setSortOrder}
 			/>
 
-			{isLoading || isPending ? (
+			{isLoading || isPending || isFetchingNextPage ? (
 				<SkeletonPostCard />
 			) : (
 				<div className="space-y-4">
@@ -47,6 +53,27 @@ export const PostSection = () => {
 					)}
 				</div>
 			)}
+
+			<div className="mt-4">
+				<Button
+					onClick={() => fetchNextPage()}
+					disabled={
+						!hasNextPage || isLoading || isPending || isFetchingNextPage
+					}
+				>
+					{isLoading || isPending || isFetchingNextPage ? (
+						<>
+							<Loader2 className="repeat-infinite animate-spin" /> Loading ...
+						</>
+					) : hasNextPage ? (
+						<>
+							<ArrowRight className="size-4" /> Load More
+						</>
+					) : (
+						"No more posts"
+					)}
+				</Button>
+			</div>
 		</>
 	);
 };
